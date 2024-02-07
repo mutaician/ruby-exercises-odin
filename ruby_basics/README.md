@@ -1,50 +1,39 @@
-# Ruby Basics Exercises
-These exercises are designed to complement the [Ruby Basic lessons](https://www.theodinproject.com/paths/full-stack-ruby-on-rails/courses/ruby#basic-ruby) on [The Odin Project](https://www.theodinproject.com/). Each folder contains exercises and specs (tests) for the lessons in the Ruby Basics section.
+# The Odin Project Ruby Exercises
 
-### Usage
+## About this repository
 
-1. First change directory into the lesson directory, for example `cd 1_data_types`.
-2. Run the tests for an exercise file, for example `rspec spec/numbers_exercises_spec.rb`. The first test will fail and the rest will be skipped.
-3. Open that corresponding exercise file in your text editor, in this case the `exercises/numbers_exercises.rb` file.
-4. Write the code to get the failing test to pass in the exercise file and run the tests again to verify it passes.
-5. Each `exercises` folder has a corresponding `spec` folder with matching test files. For instance, you can find the tests for `exercises/numbers_exercises.rb` in `spec/numbers_exercises_spec.rb`. Find and open the matching spec file.
-6. Unskip the next test by removing the `x` from `xit`.
-7. Run your tests again `rspec spec/numbers_exercises_spec.rb` the second test should now be failing.
-8. Repeat the steps from step 2 until no more tests are skipped and all are passing.
+This repository is a complement to the Ruby course for The Odin Project. It contains a series of Ruby exercises alongside pre-written tests that will help guide the student towards a solution, providing a Test Driven Development experience.
 
-**TIP**: When there is only one exercise file in a directory (such as in `6_arrays`) you can omit the path to the file and just enter `rspec` to run the tests in that file.
+Each set of exercises should only be done **after** being directed to do so in the assignment of the corresponding Ruby lesson. I.e. if you just finished the Basic Data Types lesson you should **only** do the exercises in the `1_data_types` folder for now.
 
-###  Contents
+## Cloning and installation
 
-#### 1.Basic Data Types
+Clone this repository to your local machine. To do this, click on the green "Code" button at the top right of list of files and copy the link in the prompt. Then, run the following command in your terminal:
 
-- [ ] Numbers Exercises
-- [ ] Strings Exercises
+    git clone <link>
 
-#### 6.Arrays
+This will create a folder called 'ruby-exercises' inside the directory you ran the command in.
 
-- [ ] Array Exercises
+CD into that folder:
 
-#### 7.Hashes
+    cd ruby-exercises
 
-- [ ] Hash Exercises
+Now before beginning work on the exercises, you'll want to install a gem called RSpec. RSpec is a popular Ruby testing framework that is used in this repository to provide you with tests that check your solutions.
 
-#### 8.Methods
+To install RSpec, run the following command in your terminal:
 
-- [ ] Method Exercises
+    gem install rspec
 
-#### 9.Debugging
+You should see a message that says something along the lines of "6 gems installed" in your terminal. Verify that the installation was successful by simply running the following command:
 
-- [ ] Debugging Exercises
+    rspec
 
-#### 10.Basic Enumerables
+Which should print a few lines about not finding any examples. This is ok and means it's working!
 
-- [ ] Basic Enumerable Exercises
+If your shell reports that it cannot find the rspec binary, it may be necessary to run the following command:
 
-#### 11.Predicate Enumerables
+    rbenv rehash
 
-- [ ] Predicate Enumerable Exercises
+## Usage
 
-#### 12.Nested Collections
-
-- [ ] Nested Collection Exercises
+Each directory contains a read me with instructions for the exercises within them.
