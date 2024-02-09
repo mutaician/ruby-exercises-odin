@@ -1,19 +1,25 @@
 
 class ComputerPlayer
-  attr_reader :pegs_count, :colors_count
-  def initialize(pegs_count, colors_count)
-    @pegs_count = pegs_count
+  attr_reader :holes_count, :colors_count
+  def initialize(holes_count, colors_count)
+    @holes_count = holes_count
     @colors_count = colors_count
   end
 
-  def generate_guess_2(user_secret_code,turns)
-    computer_guess = [1,2,3,4]
+  def generate_guess_2?(user_secret_code,turns)
+    predicted_correct_guess = Array.new(@colors_count)
     guess_range = (1..@colors_count).to_a
-    g_times = 0
-    while turns > 0
+    computer_guess = guess_range.sample(4)
+    guess_times = 0
+    while true
       puts "Computer guessing #{computer_guess}"
       if computer_guess == user_secret_code
-        puts "Computer wins in #{g_times}"
+        puts "Computer wins in #{guess_times} attempts guessing the code #{user_secret_code}"
+        return true
+        break
+      elsif turns < 1
+        puts "Computer looses.The code is #{user_secret_code}"
+        return false
         break
       end
 
@@ -23,19 +29,25 @@ class ComputerPlayer
         end
       end
 
-      
-
-      computer_guess = []
-      @pegs_count.times do
-        computer_guess << guess_range.sample
+      computer_guess.each_with_index do |num, index|
+        if num == user_secret_code[index]
+          predicted_correct_guess[index] = num
+        else
+          computer_guess[index] = guess_range.sample
+        end
       end
-      g_times += 1
+
+      if predicted_correct_guess.all? { |item| item != nil }
+        computer_guess = predicted_correct_guess
+      end
+      turns -= 1
+      guess_times += 1
     end
   end
 
   def generate_guess
     guess = []
-    @pegs_count.times do
+    @holes_count.times do
       guess << rand(1..@colors_count)
     end
     guess
@@ -60,24 +72,24 @@ end
 
 
 class Mastermind
-  def initialize(pegs_count, colors_count,attempts, user_secret_code = false)
-    @pegs_count = pegs_count
+  def initialize(holes_count, colors_count,attempts, user_secret_code = false)
+    @holes_count = holes_count
     @colors_count = colors_count
     @attempts = attempts
     @user_secret_code = user_secret_code
 
     if user_secret_code
       @secret_code = get_user_code
-      computer = ComputerPlayer.new(@pegs_count,@colors_count)
-      computer.generate_guess_2(@secret_code, @attempts)
+      computer = ComputerPlayer.new(@holes_count,@colors_count)
+      computer.generate_guess_2?(@secret_code, @attempts)
     end
   end
 
   def generate_secret_code
     secret_code = []
-    @pegs_count.times do
-      peg_color = rand(1..@colors_count)
-      secret_code << peg_color
+    @holes_count.times do
+      hole_color = rand(1..@colors_count)
+      secret_code << hole_color
     end
     secret_code
   end
@@ -86,7 +98,7 @@ class Mastermind
     puts "Enter the secret code(e.g,1234) between (1 and #{@colors_count}):"
     input = gets.chomp
     user_secret_code = input.split('').map(&:to_i)
-    while user_secret_code.include?(0) || user_secret_code.length != @pegs_count
+    while user_secret_code.include?(0) || user_secret_code.length != @holes_count
       puts "Invalid code. Try again"
       input = gets.chomp
       user_secret_code = input.split('').map(&:to_i)
@@ -97,7 +109,7 @@ class Mastermind
 
   def display_instructions
     puts "The objective of the game is to guess the secret code."
-    puts "The secret code consists of #{@pegs_count} holes, each with a color."
+    puts "The secret code consists of #{@holes_count} holes, each with a color."
     puts "There are #{@colors_count} colors available for the holes."
     puts "After each guess, you will receive feedback to help you refine your next guess."
     puts "A '+' hole indicates correct color in the correct position"
@@ -118,14 +130,14 @@ class Mastermind
     end
 
 
-    while guess.include?(0) || guess.length != @pegs_count
+    while guess.include?(0) || guess.length != @holes_count
       if input.downcase.include?('h')
         puts " '+'  indicates correct color in the correct position."
         puts " '-'  indicates correct color in wrong position."
-        puts " '.'  indicates wrong peg."
+        puts " '.'  indicates wrong color."
         puts "Enter your guess "
       else
-        puts "Invalid guess! Enter a valid number and #{@pegs_count} numbers."
+        puts "Invalid guess! Enter a valid number and #{@holes_count} numbers."
       end
       input = gets.chomp
       guess = input.split('').map(&:to_i)
@@ -135,10 +147,10 @@ class Mastermind
 
   def provide_feedback(guess,secret_code)
     feedback = []
-    guess.each_with_index do |peg, index|
-      if peg == secret_code[index]
+    guess.each_with_index do |num, index|
+      if num == secret_code[index]
         feedback << '+'
-      elsif secret_code.include?(peg)
+      elsif secret_code.include?(num)
         feedback << '-'
       else
         feedback << '.'
@@ -204,7 +216,7 @@ class Mastermind
 end
 
 
-pegs_count = 4
+holes_count = 4
 colors_count = 6
 turns = 12
 
@@ -216,10 +228,28 @@ choice = gets.chomp.strip.downcase
 case choice
 when 'c'
   #create secret code
-  Mastermind.new(pegs_count, colors_count, turns, true)
+  Mastermind.new(holes_count, colors_count, turns, true)
 when 'g'
-  game = Mastermind.new(pegs_count, colors_count,turns)
+  game = Mastermind.new(holes_count, colors_count,turns)
   game.start_game
 else
   puts "Invalid choice."
 end
+
+
+# # Test case
+# wins = 0
+# losses = 0
+# 100000.times do
+#   computer  = ComputerPlayer.new(holes_count, colors_count)
+#   secret_code = [1,2,3,4,5,6].sample(4)
+#   if computer.generate_guess_2?(secret_code,turns)
+#     wins += 1
+#   else
+#     losses += 1
+#   end
+
+# end
+
+# puts "wins: #{wins}"
+# puts "losses: #{losses}"
