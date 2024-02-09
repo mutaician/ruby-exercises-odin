@@ -6,6 +6,33 @@ class ComputerPlayer
     @colors_count = colors_count
   end
 
+  def generate_guess_2(user_secret_code,turns)
+    computer_guess = [1,2,3,4]
+    guess_range = (1..@colors_count).to_a
+    g_times = 0
+    while turns > 0
+      puts "Computer guessing #{computer_guess}"
+      if computer_guess == user_secret_code
+        puts "Computer wins in #{g_times}"
+        break
+      end
+
+      computer_guess.each do |num_code|
+        if !user_secret_code.include?(num_code)
+          guess_range.reject! { |num| num == num_code}
+        end
+      end
+
+      
+
+      computer_guess = []
+      @pegs_count.times do
+        computer_guess << guess_range.sample
+      end
+      g_times += 1
+    end
+  end
+
   def generate_guess
     guess = []
     @pegs_count.times do
@@ -25,7 +52,6 @@ class ComputerPlayer
         break
       end
       g_times += 1
-      # turns -= 1
     end
     puts "Computer loses" if turns < 1
   end
@@ -43,7 +69,7 @@ class Mastermind
     if user_secret_code
       @secret_code = get_user_code
       computer = ComputerPlayer.new(@pegs_count,@colors_count)
-      computer.guess_users_secret_code(@secret_code, @attempts)
+      computer.generate_guess_2(@secret_code, @attempts)
     end
   end
 
