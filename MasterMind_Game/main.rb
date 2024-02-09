@@ -1,11 +1,50 @@
 
+class ComputerPlayer
+  attr_reader :pegs_count, :colors_count
+  def initialize(pegs_count, colors_count)
+    @pegs_count = pegs_count
+    @colors_count = colors_count
+  end
+
+  def generate_guess
+    guess = []
+    @pegs_count.times do
+      guess << rand(1..@colors_count)
+    end
+    guess
+  end
+
+  def guess_users_secret_code(user_secret_code, turns)
+    p "computer quessing #{user_secret_code}"
+    g_times = 0
+    while turns > 0
+      computer_guess = generate_guess
+      puts "Computer guessed #{computer_guess}"
+      if computer_guess == user_secret_code
+        puts "Computer wins in #{g_times} turns"
+        break
+      end
+      g_times += 1
+      # turns -= 1
+    end
+    puts "Computer loses" if turns < 1
+  end
+
+end
+
 
 class Mastermind
-  attr_accessor :secret_code
-  def initialize(pegs_count, colors_count,attempts)
+  def initialize(pegs_count, colors_count,attempts, user_secret_code = false)
     @pegs_count = pegs_count
     @colors_count = colors_count
     @attempts = attempts
+    @user_secret_code = user_secret_code
+
+    if user_secret_code
+      @secret_code = get_user_code
+      computer = ComputerPlayer.new(@pegs_count,@colors_count)
+      computer.guess_users_secret_code(@secret_code, @attempts)
+    end
   end
 
   def generate_secret_code
@@ -17,15 +56,27 @@ class Mastermind
     secret_code
   end
 
+  def get_user_code
+    puts "Enter the secret code(e.g,1234) between (1 and #{@colors_count}):"
+    input = gets.chomp
+    user_secret_code = input.split('').map(&:to_i)
+    while user_secret_code.include?(0) || user_secret_code.length != @pegs_count
+      puts "Invalid code. Try again"
+      input = gets.chomp
+      user_secret_code = input.split('').map(&:to_i)
+    end
+    user_secret_code
+
+  end
+
   def display_instructions
-    puts "Welcome to Mastermind!"
     puts "The objective of the game is to guess the secret code."
-    puts "The secret code consists of #{@pegs_count} pegs, each with a color."
-    puts "There are #{@colors_count} colors available for the pegs."
+    puts "The secret code consists of #{@pegs_count} holes, each with a color."
+    puts "There are #{@colors_count} colors available for the holes."
     puts "After each guess, you will receive feedback to help you refine your next guess."
-    puts "A '+' peg indicates correct color in the correct position"
-    puts "A '-' peg indicates correct color in wrong position"
-    puts "A '.' peg indicates wrong peg "
+    puts "A '+' hole indicates correct color in the correct position"
+    puts "A '-' hole indicates correct color in wrong position"
+    puts "A '.' hole indicates wrong hole "
     puts "Enter q to quit."
     puts "You have a #{@attempts} attempts to guess the secret code."
     puts "Let's begin!"
@@ -56,12 +107,12 @@ class Mastermind
     guess
   end
 
-  def provide_feedback(guess)
+  def provide_feedback(guess,secret_code)
     feedback = []
     guess.each_with_index do |peg, index|
-      if peg == @secret_code[index]
+      if peg == secret_code[index]
         feedback << '+'
-      elsif @secret_code.include?(peg)
+      elsif secret_code.include?(peg)
         feedback << '-'
       else
         feedback << '.'
@@ -70,18 +121,18 @@ class Mastermind
     puts "Feedback: #{feedback.join(' ')}"
   end
 
-  def game_over?(guesses)
-    return :win if guesses.last == @secret_code
+  def game_over?(guesses,secret_code)
+    return :win if guesses.last == secret_code
     return :lose if guesses.length >= @attempts
     false #Game is still ongoing
   end
 
-  def display_result(result)
+  def display_result(result,secret_code)
     case result
     when :win
-      puts "Congratulations! You guessed the secret code: #{@secret_code}"
+      puts "Congratulations! You guessed the secret code: #{secret_code}"
     when :lose
-      puts "Sorry, you ran out of attempts. The secret code was #{@secret_code}"
+      puts "Sorry, you ran out of attempts. The secret code was #{secret_code}"
     end
   end
 
@@ -89,8 +140,7 @@ class Mastermind
     display_instructions
     game_is_on = true
     while true
-      @secret_code = generate_secret_code
-      p secret_code
+      secret_code = generate_secret_code
       guesses = []
       attempts_remaining = @attempts
       loop do
@@ -103,11 +153,11 @@ class Mastermind
         end
         guesses << guess
 
-        provide_feedback(guess)
+        provide_feedback(guess,secret_code)
 
-        result = game_over?(guesses)
+        result = game_over?(guesses,secret_code)
         if result == :win || result == :lose
-          display_result(result)
+          display_result(result,secret_code)
           break
         end
         attempts_remaining -= 1
@@ -130,6 +180,20 @@ end
 
 pegs_count = 4
 colors_count = 6
-turns = 3
-game = Mastermind.new(pegs_count, colors_count,turns)
-game.start_game
+turns = 12
+
+puts "Welcome to Mastermind"
+puts "Do you want to create the secret code or guess it?"
+puts "Enter 'c' to create or 'g' to guess:"
+choice = gets.chomp.strip.downcase
+
+case choice
+when 'c'
+  #create secret code
+  Mastermind.new(pegs_count, colors_count, turns, true)
+when 'g'
+  game = Mastermind.new(pegs_count, colors_count,turns)
+  game.start_game
+else
+  puts "Invalid choice."
+end
