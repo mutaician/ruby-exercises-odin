@@ -21,5 +21,5 @@ Welcome to the Hangman game! This is a simple implementation of the classic word
 
 ### License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
